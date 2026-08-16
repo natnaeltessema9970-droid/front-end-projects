@@ -3,39 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>quiz game</title>
+    <title>Weekly Flashcard Organizer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="screen active" id="start-screen">
-            <h1>Quiz time!</h1>
-            <p> test your knowledge with this questions</p>
-            <button id="start-btn">start Quiz</button>
-        </div>
-        <div class="screen" id="quiz-screen">
-            <div class="quiz-header">
-                <h2 id="question-text">question goes here</h2>
-                <div class="quiz-info">
-                    <p>question<span id="current-question">1</span> of <span id="total-questions">5</span></p>
-                        <p>score:<span id="score">0</span></p>
+
+    <header>
+        <h1>Weekly Flashcard Organizer</h1>
+    </header>
+
+    <div class="app-container">
+        <aside class="task-pool">
+            <h3>Create Task</h3>
+            <form class="task-form" id="taskForm">
+                <input type="text" id="taskTitle" placeholder="Task Title..." required>
+                <textarea id="taskDesc" placeholder="Details/Notes..." rows="2"></textarea>
+                <button type="submit">Add Flashcard</button>
+            </form>
+            
+            <h3>Task Container</h3>
+            <div class="pool-dropzone" id="poolDropzone">
                 </div>
+        </aside>
+
+        <main class="schedule-grid">
+            <div class="day-column">
+                <h3>Monday</h3>
+                <div class="day-dropzone" data-day="Monday"></div>
             </div>
-            <div id="answer-container" class="answers-container">
-             </div>
-            <div class="progress-bar">
-                <div id="progress" class="progress"></div>
+            <div class="day-column">
+                <h3>Tuesday</h3>
+                <div class="day-dropzone" data-day="Tuesday"></div>
             </div>
-        </div>
-        <div id="result-screen" class="screen">
-            <h1>quiz results</h1>
-            <div class="result-info">
-                <p>you scored <span id="final-score">0</span> out of <span id="max-score">5</span></p>
-                <div id="result-message">good job!</div>
+            <div class="day-column">
+                <h3>Wednesday</h3>
+                <div class="day-dropzone" data-day="Wednesday"></div>
             </div>
-            <button id="restart-btn">restart quiz</button>
-        </div>
+            <div class="day-column">
+                <h3>Thursday</h3>
+                <div class="day-dropzone" data-day="Thursday"></div>
+            </div>
+            <div class="day-column">
+                <h3>Friday</h3>
+                <div class="day-dropzone" data-day="Friday"></div>
+            </div>
+            <div class="day-column">
+                <h3>Saturday</h3>
+                <div class="day-dropzone" data-day="Saturday"></div>
+            </div>
+            <div class="day-column">
+                <h3>Sunday</h3>
+                <div class="day-dropzone" data-day="Sunday"></div>
+            </div>
+        </main>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

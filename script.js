@@ -1,163 +1,68 @@
-//DOM Elements
-const startScreen = document.getElementById("start-screen");
-const quizScreen = document.getElementById("quiz-screen");
-const resultScreen = document.getElementById("result-screen");
-const startButton = document.getElementById("start-btn");
-const questionText = document.getElementById("question-text");
-const answersContainer = document.getElementById("answer-container");
-const currentQuestionSpan = document.getElementById("current-question");
-const totalQuestionSpan = document.getElementById("total-questions");
-const scoreSpan = document.getElementById("score");
-const finalScoreSpan = document.getElementById("final-score");
-const maxScoreSpan = document.getElementById("max-score");
-const resultMessage = document.querySelector("#result-message") || document.querySelector(".result-message");
-const restartButton = document.getElementById("restart-btn");
-const progressBar = document.getElementById("progress");
-const quizQuestions = [
-    {
-    questionText:"what is the capital of germany",
-    answers: [
-        { text:"minsk",correct: false},
-        { text:"london",correct: false},
-        { text:"geneva",correct: false},
-        { text:"frankfurt",correct: true},
-    ],
-},
-{
-    questionText:"what is the largest continent on earth",
-    answers: [
-        { text:"europe",correct: false},
-        { text:"north america",correct: false},
-        { text:"asia",correct: true},
-        { text:"australia",correct: false},
-    ],
-},
-{
-    questionText:"what is the smallest country in the world",
-    answers: [
-        { text:"luthinia",correct: false},
-        { text:"vatican",correct: true},
-        { text:"iran",correct: false},
-        { text:"palestain",correct: false},
-    ],
-},
-{
-    questionText:"who is the inventor of Ac generator",
-    answers: [
-        { text:"Thomas eddison",correct: false},
-        { text:"Nicolas tesla",correct: true},
-        { text:"Albert enstein",correct: false},
-        { text:"Steven hokins",correct: false},
-    ],
-},
-{
-    questionText:"where is the great wall found",
-    answers: [
-        { text:"china",correct: true},
-        { text:"germany",correct: false},
-        { text:"poland",correct: false},
-        { text:"france",correct: false},
-    ],
-},
-]
-//Quiz state vars
-let currentQuestionIndex = 0;
-let score = 0;
-let answerDisabled = false;
+const taskForm = document.getElementById('taskForm');
+const taskTitle = document.getElementById('taskTitle');
+const taskDesc = document.getElementById('taskDesc');
+const poolDropzone = document.getElementById('poolDropzone');
+const dropzones = document.querySelectorAll('.day-dropzone, .pool-dropzone');
 
-totalQuestionSpan.textContent = quizQuestions.length;
-maxScoreSpan.textContent = quizQuestions.length;
-// Event listeners
-startButton.addEventListener("click", startQuiz);
-restartButton.addEventListener("click", restartQuiz);
+// Form Submit to Create Flashcard
+taskForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    createFlashcard(taskTitle.value, taskDesc.value);
+    
+    // Reset form fields
+    taskTitle.value = '';
+    taskDesc.value = '';
+});
 
-function startQuiz(){
-    currentQuestionIndex = 0;
-    score = 0;
-    scoreSpan.textContent = 0;
-    startScreen.classList.remove("active");
-    quizScreen.classList.add("active");
-    showQuestion();
-}
+// Function to create a Flashcard element
+function createFlashcard(title, description) {
+    const card = document.createElement('div');
+    card.classList.add('flashcard');
+    card.setAttribute('draggable', 'true');
+    
+    // Using setHTMLUnsafe for easy rendering of internal structural elements
+    card.setHTMLUnsafe(`
+        <button class="delete-btn">&times;</button>
+        <h4>${title}</h4>
+        <p>${description}</p>
+    `);
 
-function showQuestion(){
-    //reset state
-    answerDisabled = false;
-
-    const currentQuestion = quizQuestions[currentQuestionIndex];
-    currentQuestionSpan.textContent = currentQuestionIndex + 1;
-
-    const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
-    progressBar.style.width = progressPercent + "%";
-
-    questionText.textContent = currentQuestion.questionText;
-
-    answersContainer.innerHTML = "";
-
-    currentQuestion.answers.forEach(answer => {
-        const button = document.createElement("button");
-        button.textContent = answer.text;
-        button.classList.add("answers-btn");
-
-        button.dataset.correct = answer.correct;
-        button.addEventListener("click", selectAnswer);
-
-        answersContainer.appendChild(button);
-    });
-}
-
-function selectAnswer (event){
-    if(answerDisabled) return
-    answerDisabled = true
-    const selectedButton = event.target;
-    const isCorrect = selectedButton.dataset.correct === "true"
-    Array.from(answersContainer.children).forEach(button => {
-        const buttonIsCorrect = button.dataset.correct === "true";
-        if (buttonIsCorrect) {
-            button.classList.add("correct");
-        }
-        if (button === selectedButton && !buttonIsCorrect) {
-            button.classList.add("incorrect");
-        }
+    // Delete Event
+    card.querySelector('.delete-btn').addEventListener('click', () => {
+        card.remove();
     });
 
-    if(isCorrect){
-        score++;
-        scoreSpan.textContent = score;
-    }
+    // Drag Events for the Card
+    card.addEventListener('dragstart', () => {
+        card.classList.add('dragging');
+    });
 
-    setTimeout(() => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizQuestions.length) {
-            showQuestion();
-        } else {
-            showResults();
+    card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+    });
+
+    // Put it in the main task container initially
+    poolDropzone.appendChild(card);
+}
+
+// Setup Dropzone Events
+dropzones.forEach(zone => {
+    zone.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Required to allow dropping cards
+        zone.classList.add('hovered');
+    });
+
+    zone.addEventListener('dragleave', () => {
+        zone.classList.remove('hovered');
+    });
+
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('hovered');
+        const draggingCard = document.querySelector('.dragging');
+        if (draggingCard) {
+            zone.appendChild(draggingCard);
         }
-    }, 900);
-}
-function showResults(){
-    quizScreen.classList.remove("active");
-    resultScreen.classList.add("active");
-
-    finalScoreSpan.textContent = score;
-
-    const percentage = (score/quizQuestions.length)*100;
-
-    if(percentage === 100){
-        resultMessage.textContent = "perfect! you are a genius."
-    }else if(percentage === 80){
-        resultMessage.textContent = "great job! you know your stuff "
-    }else if(percentage === 60){
-        resultMessage.textContent = "Good effort! keep learning "
-    }else if(percentage === 40){
-        resultMessage.textContent = "Not bad! try again later"
-    }else {
-        resultMessage.textContent = "Keep studying! you will get better "
-    }
-}
-function restartQuiz(){
-    resultScreen.classList.remove("active");
-
-    startQuiz();
-}
-
+    });
+});
